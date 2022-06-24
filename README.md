@@ -1,4 +1,4 @@
-# my-blog
+# class-notification
 
 ## Project setup
 ```
