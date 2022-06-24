@@ -10,7 +10,7 @@ Vue.config.productionTip = false
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 
-axios.defaults.baseURL = 'http://localhost:5000'
+axios.defaults.baseURL = 'http://localhost:5001'
 Vue.prototype.$axios=axios
 
 //让Vue使用ElementUI

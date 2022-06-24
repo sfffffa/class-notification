@@ -89,6 +89,12 @@
                 <el-tag>{{scope.row.type}}</el-tag>
               </template>
             </el-table-column>
+            <el-table-column
+              align="right">
+              <template slot="header" slot-scope="scope">
+                <i class="el-icon-plus" @click="notiVisible = true"></i>
+              </template>
+            </el-table-column>
           </el-table>
         </el-row>
       </el-card>
@@ -105,6 +111,29 @@
           <el-button type="primary" @click="dialogVisible = false" v-if="!canmodify" >确 认</el-button>
           <el-button type="primary" @click="isModify=!isModify" v-if="canmodify&&!isModify" >修 改</el-button>
           <el-button type="primary" @click="modify" v-if="canmodify&&isModify" >确 认</el-button>
+        </span>
+      </el-dialog>
+
+      <el-dialog
+        title="新增通告"
+        :visible.sync="notiVisible"
+        width="60%">
+        <el-form ref="form" :model="form" label-width="80px">
+          <el-form-item label="通告标题">
+            <el-input v-model="form.title" placeholder="请输入标题"></el-input>
+          </el-form-item>
+          <el-form-item label="通告内容">
+            <el-input type="textarea" v-model="form.content" placeholder="请输入内容"></el-input>
+          </el-form-item>
+          <el-form-item label="标签">
+            <el-select v-model="form.type" style="width:100%" placeholder="请选择标签">
+              <el-option v-for="label in types" :key="label.id" :label="label.name" :value="label.id"></el-option>
+            </el-select>
+          </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+          <el-button type="primary" @click="create">确 定</el-button>
+          <el-button @click="notiVisible = false">取 消</el-button>
         </span>
       </el-dialog>
 
@@ -141,7 +170,13 @@ export default ({
       checkboxGroup:[],
       isModify: false,
       id:'',
-      name:'cyf'
+      name:'cyf',
+      notiVisible:false,
+      form:{
+        title:'',
+        content:'',
+        type:''
+      }
     }
   },
   computed:{
@@ -168,10 +203,10 @@ export default ({
       }
       let hot=0;
       this.$axios
-        .post("/api/BlogNews/LikeCount?blogid="+this.curNotiId)
+        .post("/api/Notification/LikeCount?blogid="+this.curNotiId)
         .then((response)=>{
-          // console.log("huai")
-          // console.log(response)
+          console.log("huai")
+          console.log(response)
           hot=response.data.data.likeCount
         })
       return this.notifications.filter((item)=>{
@@ -195,7 +230,7 @@ export default ({
           this.types=response.data.data;
 
           this.$axios
-            .get("/api/BlogNews/BlogNewsPage",{
+            .get("/api/Notification/GetNotificationPage",{
               params:{
                 page:1,
                 size:10
@@ -226,7 +261,7 @@ export default ({
     notiClick(row){
       // console.log(row.id)
       this.$axios
-        .post("/api/BlogNews/BrowseCount?blogid="+row.id)
+        .post("/api/Notification/BrowseCount?blogid="+row.id)
         .then((response)=>{
           // console.log("hao")
           // console.log(response)
@@ -252,13 +287,29 @@ export default ({
     modify(){
       this.isModify=!this.isModify;
       this.$axios
-        .put("/api/BlogNews/Edit?id="+
+        .put("/api/Notification/Edit?id="+
           this.curNotiId+"&title="+
           this.curNoti[0].title+"&content="+
           this.curNoti[0].content+"&typeid="+
           this.curNoti[0].typeId)
         .then((response)=>{
           // console.log(response);
+        })
+      this.getNotifications();
+    },
+    create(){
+      this.notiVisible = false;
+      console.log("/api/Notification/Create?writerid="+this.id+
+        "&title="+this.form.title+
+        "&content="+this.form.content+
+        "&typeid="+this.form.type)
+      this.$axios
+        .post("/api/Notification/Create?writerid="+this.id+
+        "&title="+this.form.title+
+        "&content="+this.form.content+
+        "&typeid="+this.form.type)
+        .then((response)=>{
+          console.log(response)
         })
       this.getNotifications();
     }
